@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textos Sinônimos - invertexto.com</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="../index.html" style="text-decoration: none; color: inherit;">
+                        <h1><span class="logo-invert">invert</span><span class="logo-texto">exto</span><span class="logo-com">.com</span></h1>
+                        <p class="tagline">Ferramentas e Aplicativos Online</p>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <div class="follow-button">
+                        <span class="follow-text">Siga @invertexto</span>
+                    </div>
+                    <ul class="nav-list">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-page">
+            <div class="breadcrumb">
+                <a href="../index.html">Home</a> > Textos Sinônimos
+            </div>
+
+            <div class="tool-header">
+                <h1>Textos Sinônimos</h1>
+                <p>Cria um novo texto trocando palavras por sinônimos usando inteligência artificial.</p>
+            </div>
+
+            <div class="tool-form">
+                <div class="form-group">
+                    <label for="inputText" class="form-label">Digite o texto para gerar sinônimos:</label>
+                    <textarea id="inputText" class="form-textarea" placeholder="Digite seu texto aqui..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="generateBtn" class="btn btn-primary">Gerar Sinônimos</button>
+                    <button id="clearBtn" class="btn btn-secondary">Limpar</button>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <p style="font-size: 0.875rem; color: var(--text-gray); font-style: italic;">
+                        💡 Esta ferramenta utiliza inteligência artificial para substituir palavras por sinônimos apropriados, 
+                        mantendo o contexto e significado do texto original.
+                    </p>
+                </div>
+            </div>
+
+            <div id="loadingSection" class="loading" style="display: none;">
+                Gerando sinônimos...
+            </div>
+
+            <div id="resultSection" class="result-section" style="display: none;">
+                <h3>Texto com Sinônimos:</h3>
+                <div id="resultContent" class="result-content"></div>
+                <div class="btn-group" style="margin-top: 1rem;">
+                    <button id="copyBtn" class="btn btn-secondary">Copiar Resultado</button>
+                    <button id="regenerateBtn" class="btn btn-primary">Gerar Novamente</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputText = document.getElementById('inputText');
+            const generateBtn = document.getElementById('generateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            const loadingSection = document.getElementById('loadingSection');
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            const toolForm = document.querySelector('.tool-form');
+
+            async function generateSynonyms() {
+                const text = inputText.value;
+                
+                // Clear previous messages
+                TextTools.clearMessages(toolForm);
+                
+                if (!TextTools.validateInput(text, 10)) {
+                    TextTools.showError('Por favor, digite pelo menos 10 caracteres para gerar sinônimos.', toolForm);
+                    return;
+                }
+
+                // Show loading state
+                loadingSection.style.display = 'block';
+                resultSection.style.display = 'none';
+                generateBtn.disabled = true;
+                generateBtn.textContent = 'Gerando...';
+
+                try {
+                    const synonymText = await TextTools.generateSynonyms(text);
+                    
+                    // Hide loading and show results
+                    loadingSection.style.display = 'none';
+                    resultContent.textContent = synonymText;
+                    resultSection.style.display = 'block';
+                    
+                    TextTools.showSuccess('Sinônimos gerados com sucesso!', toolForm);
+                } catch (error) {
+                    loadingSection.style.display = 'none';
+                    TextTools.showError('Erro ao gerar sinônimos. Tente novamente em alguns instantes.', toolForm);
+                } finally {
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Gerar Sinônimos';
+                }
+            }
+
+            generateBtn.addEventListener('click', generateSynonyms);
+            regenerateBtn.addEventListener('click', generateSynonyms);
+
+            clearBtn.addEventListener('click', () => {
+                inputText.value = '';
+                resultSection.style.display = 'none';
+                loadingSection.style.display = 'none';
+                TextTools.clearMessages(toolForm);
+                inputText.focus();
+            });
+
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(resultContent.textContent);
+                    TextTools.showSuccess('Texto copiado para a área de transferência!', resultSection);
+                } catch (err) {
+                    TextTools.showError('Erro ao copiar texto. Tente selecionar e copiar manualmente.', resultSection);
+                }
+            });
+
+            // Auto-focus on input
+            inputText.focus();
+        });
+    </script>
+</body>
+</html>
