@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Caracteres - invertexto.com</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="../index.html" style="text-decoration: none; color: inherit;">
+                        <h1><span class="logo-invert">invert</span><span class="logo-texto">exto</span><span class="logo-com">.com</span></h1>
+                        <p class="tagline">Ferramentas e Aplicativos Online</p>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <div class="follow-button">
+                        <span class="follow-text">Siga @invertexto</span>
+                    </div>
+                    <ul class="nav-list">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-page">
+            <div class="breadcrumb">
+                <a href="../index.html">Home</a> > Contador de Caracteres
+            </div>
+
+            <div class="tool-header">
+                <h1>Contador de Caracteres</h1>
+                <p>Calcula quantos caracteres, palavras, linhas e parágrafos existem no texto.</p>
+            </div>
+
+            <div class="tool-form">
+                <div class="form-group">
+                    <label for="inputText" class="form-label">Digite ou cole seu texto:</label>
+                    <textarea id="inputText" class="form-textarea" placeholder="Digite seu texto aqui para ver as estatísticas em tempo real..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="clearBtn" class="btn btn-secondary">Limpar</button>
+                </div>
+            </div>
+
+            <div id="statsSection" class="result-section">
+                <h3>Estatísticas do Texto:</h3>
+                <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div class="stat-card" style="background-color: var(--bg-light-gray); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <div class="stat-number" id="charactersCount" style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);">0</div>
+                        <div class="stat-label" style="font-size: 0.875rem; color: var(--text-gray);">Caracteres</div>
+                    </div>
+                    <div class="stat-card" style="background-color: var(--bg-light-gray); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <div class="stat-number" id="charactersNoSpacesCount" style="font-size: 2rem; font-weight: 700; color: var(--green);">0</div>
+                        <div class="stat-label" style="font-size: 0.875rem; color: var(--text-gray);">Caracteres (sem espaços)</div>
+                    </div>
+                    <div class="stat-card" style="background-color: var(--bg-light-gray); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <div class="stat-number" id="wordsCount" style="font-size: 2rem; font-weight: 700; color: var(--orange);">0</div>
+                        <div class="stat-label" style="font-size: 0.875rem; color: var(--text-gray);">Palavras</div>
+                    </div>
+                    <div class="stat-card" style="background-color: var(--bg-light-gray); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <div class="stat-number" id="linesCount" style="font-size: 2rem; font-weight: 700; color: var(--purple);">0</div>
+                        <div class="stat-label" style="font-size: 0.875rem; color: var(--text-gray);">Linhas</div>
+                    </div>
+                    <div class="stat-card" style="background-color: var(--bg-light-gray); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <div class="stat-number" id="paragraphsCount" style="font-size: 2rem; font-weight: 700; color: var(--pink);">0</div>
+                        <div class="stat-label" style="font-size: 0.875rem; color: var(--text-gray);">Parágrafos</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1rem; background-color: var(--bg-light-gray); border-radius: 0.5rem;">
+                    <h4 style="margin-bottom: 0.5rem; color: var(--text-dark);">Informações Adicionais:</h4>
+                    <div id="additionalInfo" style="font-size: 0.875rem; color: var(--text-gray);">
+                        • Tempo estimado de leitura: <span id="readingTime">0 minutos</span><br>
+                        • Tempo estimado de digitação: <span id="typingTime">0 minutos</span><br>
+                        • Média de caracteres por palavra: <span id="avgCharsPerWord">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputText = document.getElementById('inputText');
+            const clearBtn = document.getElementById('clearBtn');
+            const charactersCount = document.getElementById('charactersCount');
+            const charactersNoSpacesCount = document.getElementById('charactersNoSpacesCount');
+            const wordsCount = document.getElementById('wordsCount');
+            const linesCount = document.getElementById('linesCount');
+            const paragraphsCount = document.getElementById('paragraphsCount');
+            const readingTime = document.getElementById('readingTime');
+            const typingTime = document.getElementById('typingTime');
+            const avgCharsPerWord = document.getElementById('avgCharsPerWord');
+
+            function updateStats() {
+                const text = inputText.value;
+                const stats = TextTools.countCharacters(text);
+                
+                charactersCount.textContent = stats.characters.toLocaleString();
+                charactersNoSpacesCount.textContent = stats.charactersNoSpaces.toLocaleString();
+                wordsCount.textContent = stats.words.toLocaleString();
+                linesCount.textContent = stats.lines.toLocaleString();
+                paragraphsCount.textContent = stats.paragraphs.toLocaleString();
+
+                // Calculate reading time (average 200 words per minute)
+                const readingMinutes = Math.ceil(stats.words / 200);
+                readingTime.textContent = readingMinutes === 0 ? '0 minutos' : 
+                    readingMinutes === 1 ? '1 minuto' : `${readingMinutes} minutos`;
+
+                // Calculate typing time (average 40 words per minute)
+                const typingMinutes = Math.ceil(stats.words / 40);
+                typingTime.textContent = typingMinutes === 0 ? '0 minutos' : 
+                    typingMinutes === 1 ? '1 minuto' : `${typingMinutes} minutos`;
+
+                // Calculate average characters per word
+                const avgChars = stats.words > 0 ? (stats.charactersNoSpaces / stats.words).toFixed(1) : 0;
+                avgCharsPerWord.textContent = avgChars;
+            }
+
+            // Update stats in real-time as user types
+            inputText.addEventListener('input', updateStats);
+
+            clearBtn.addEventListener('click', () => {
+                inputText.value = '';
+                updateStats();
+                inputText.focus();
+            });
+
+            // Auto-focus on input and initial stats update
+            inputText.focus();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
