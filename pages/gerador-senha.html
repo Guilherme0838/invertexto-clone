@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Senha - invertexto.com</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="../index.html" style="text-decoration: none; color: inherit;">
+                        <h1><span class="logo-invert">invert</span><span class="logo-texto">exto</span><span class="logo-com">.com</span></h1>
+                        <p class="tagline">Ferramentas e Aplicativos Online</p>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <div class="follow-button">
+                        <span class="follow-text">Siga @invertexto</span>
+                    </div>
+                    <ul class="nav-list">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-page">
+            <div class="breadcrumb">
+                <a href="../index.html">Home</a> > Gerador de Senha
+            </div>
+
+            <div class="tool-header">
+                <h1>Gerador de Senha</h1>
+                <p>Gera senhas aleatórias seguras com diversos tamanhos e opções de caracteres.</p>
+            </div>
+
+            <div class="tool-form">
+                <div class="form-group">
+                    <label for="passwordLength" class="form-label">Comprimento da senha:</label>
+                    <input type="range" id="passwordLength" min="4" max="128" value="12" class="form-range">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--text-gray); margin-top: 0.25rem;">
+                        <span>4</span>
+                        <span id="lengthValue">12</span>
+                        <span>128</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tipos de caracteres:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="includeUppercase" checked>
+                            <span>Maiúsculas (A-Z)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="includeLowercase" checked>
+                            <span>Minúsculas (a-z)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="includeNumbers" checked>
+                            <span>Números (0-9)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="includeSymbols">
+                            <span>Símbolos (!@#$%...)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="generateBtn" class="btn btn-primary">Gerar Senha</button>
+                    <button id="generateMultipleBtn" class="btn btn-secondary">Gerar 5 Senhas</button>
+                </div>
+            </div>
+
+            <div id="resultSection" class="result-section" style="display: none;">
+                <h3>Senha(s) Gerada(s):</h3>
+                <div id="passwordsContainer"></div>
+                <div id="strengthIndicator" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordLength = document.getElementById('passwordLength');
+            const lengthValue = document.getElementById('lengthValue');
+            const includeUppercase = document.getElementById('includeUppercase');
+            const includeLowercase = document.getElementById('includeLowercase');
+            const includeNumbers = document.getElementById('includeNumbers');
+            const includeSymbols = document.getElementById('includeSymbols');
+            const generateBtn = document.getElementById('generateBtn');
+            const generateMultipleBtn = document.getElementById('generateMultipleBtn');
+            const resultSection = document.getElementById('resultSection');
+            const passwordsContainer = document.getElementById('passwordsContainer');
+            const strengthIndicator = document.getElementById('strengthIndicator');
+            const toolForm = document.querySelector('.tool-form');
+
+            // Update length display
+            passwordLength.addEventListener('input', () => {
+                lengthValue.textContent = passwordLength.value;
+            });
+
+            function validateOptions() {
+                return includeUppercase.checked || includeLowercase.checked || 
+                       includeNumbers.checked || includeSymbols.checked;
+            }
+
+            function calculateStrength(password) {
+                let score = 0;
+                let feedback = [];
+
+                // Length
+                if (password.length >= 12) score += 2;
+                else if (password.length >= 8) score += 1;
+                else feedback.push('Use pelo menos 8 caracteres');
+
+                // Character variety
+                if (/[a-z]/.test(password)) score += 1;
+                if (/[A-Z]/.test(password)) score += 1;
+                if (/[0-9]/.test(password)) score += 1;
+                if (/[^a-zA-Z0-9]/.test(password)) score += 2;
+
+                // Patterns
+                if (!/(.)\1{2,}/.test(password)) score += 1; // No repeated characters
+                if (!/012|123|234|345|456|567|678|789|890|abc|bcd|cde/.test(password.toLowerCase())) score += 1;
+
+                let strength, color, message;
+                if (score >= 7) {
+                    strength = 'Muito Forte';
+                    color = '#10b981';
+                    message = 'Excelente! Esta senha é muito segura.';
+                } else if (score >= 5) {
+                    strength = 'Forte';
+                    color = '#059669';
+                    message = 'Boa! Esta senha é segura.';
+                } else if (score >= 3) {
+                    strength = 'Média';
+                    color = '#f59e0b';
+                    message = 'Razoável, mas pode ser melhorada.';
+                } else {
+                    strength = 'Fraca';
+                    color = '#ef4444';
+                    message = 'Esta senha precisa ser fortalecida.';
+                }
+
+                return { strength, color, message, score, maxScore: 8 };
+            }
+
+            function displayPasswords(passwords) {
+                passwordsContainer.innerHTML = '';
+                
+                passwords.forEach((password, index) => {
+                    const passwordDiv = document.createElement('div');
+                    passwordDiv.style.cssText = `
+                        display: flex; 
+                        align-items: center; 
+                        gap: 1rem; 
+                        padding: 1rem; 
+                        background-color: var(--bg-light-gray); 
+                        border-radius: 0.5rem; 
+                        margin-bottom: 0.5rem;
+                        font-family: 'Courier New', monospace;
+                        font-size: 1.125rem;
+                        word-break: break-all;
+                    `;
+                    
+                    const passwordText = document.createElement('div');
+                    passwordText.textContent = password;
+                    passwordText.style.flex = '1';
+                    
+                    const copyBtn = document.createElement('button');
+                    copyBtn.textContent = 'Copiar';
+                    copyBtn.className = 'btn btn-secondary';
+                    copyBtn.style.fontSize = '0.875rem';
+                    copyBtn.style.padding = '0.5rem 1rem';
+                    
+                    copyBtn.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(password);
+                            copyBtn.textContent = 'Copiado!';
+                            copyBtn.style.backgroundColor = '#10b981';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copiar';
+                                copyBtn.style.backgroundColor = '';
+                            }, 2000);
+                        } catch (err) {
+                            TextTools.showError('Erro ao copiar senha.', passwordsContainer);
+                        }
+                    });
+                    
+                    passwordDiv.appendChild(passwordText);
+                    passwordDiv.appendChild(copyBtn);
+                    passwordsContainer.appendChild(passwordDiv);
+                });
+
+                // Show strength for single password
+                if (passwords.length === 1) {
+                    const strength = calculateStrength(passwords[0]);
+                    strengthIndicator.innerHTML = `
+                        <div style="padding: 1rem; background-color: var(--bg-light-gray); border-radius: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600;">Força da Senha:</span>
+                                <span style="color: ${strength.color}; font-weight: 600;">${strength.strength}</span>
+                            </div>
+                            <div style="background-color: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background-color: ${strength.color}; height: 100%; width: ${(strength.score / strength.maxScore) * 100}%; transition: width 0.3s;"></div>
+                            </div>
+                            <div style="font-size: 0.875rem; color: var(--text-gray); margin-top: 0.5rem;">
+                                ${strength.message}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    strengthIndicator.innerHTML = '';
+                }
+            }
+
+            function generatePasswords(count = 1) {
+                TextTools.clearMessages(toolForm);
+                
+                if (!validateOptions()) {
+                    TextTools.showError('Selecione pelo menos um tipo de caractere.', toolForm);
+                    return;
+                }
+
+                const length = parseInt(passwordLength.value);
+                const passwords = [];
+
+                for (let i = 0; i < count; i++) {
+                    const password = TextTools.generatePassword(
+                        length,
+                        includeUppercase.checked,
+                        includeLowercase.checked,
+                        includeNumbers.checked,
+                        includeSymbols.checked
+                    );
+                    passwords.push(password);
+                }
+
+                displayPasswords(passwords);
+                resultSection.style.display = 'block';
+                
+                const message = count === 1 ? 'Senha gerada com sucesso!' : `${count} senhas geradas com sucesso!`;
+                TextTools.showSuccess(message, toolForm);
+            }
+
+            generateBtn.addEventListener('click', () => generatePasswords(1));
+            generateMultipleBtn.addEventListener('click', () => generatePasswords(5));
+
+            // Generate initial password
+            generatePasswords(1);
+        });
+    </script>
+</body>
+</html>
