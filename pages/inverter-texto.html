@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inverter Texto - invertexto.com</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="../index.html" style="text-decoration: none; color: inherit;">
+                        <h1><span class="logo-invert">invert</span><span class="logo-texto">exto</span><span class="logo-com">.com</span></h1>
+                        <p class="tagline">Ferramentas e Aplicativos Online</p>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <div class="follow-button">
+                        <span class="follow-text">Siga @invertexto</span>
+                    </div>
+                    <ul class="nav-list">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-page">
+            <div class="breadcrumb">
+                <a href="../index.html">Home</a> > Inverter Texto
+            </div>
+
+            <div class="tool-header">
+                <h1>Inverter Texto</h1>
+                <p>Gera um novo texto invertido, revertendo a ordem dos caracteres.</p>
+            </div>
+
+            <div class="tool-form">
+                <div class="form-group">
+                    <label for="inputText" class="form-label">Digite o texto que deseja inverter:</label>
+                    <textarea id="inputText" class="form-textarea" placeholder="Digite seu texto aqui..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="invertBtn" class="btn btn-primary">Inverter Texto</button>
+                    <button id="clearBtn" class="btn btn-secondary">Limpar</button>
+                </div>
+            </div>
+
+            <div id="resultSection" class="result-section" style="display: none;">
+                <h3>Texto Invertido:</h3>
+                <div id="resultContent" class="result-content"></div>
+                <div class="btn-group" style="margin-top: 1rem;">
+                    <button id="copyBtn" class="btn btn-secondary">Copiar Resultado</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputText = document.getElementById('inputText');
+            const invertBtn = document.getElementById('invertBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            const toolForm = document.querySelector('.tool-form');
+
+            invertBtn.addEventListener('click', () => {
+                const text = inputText.value;
+                
+                // Clear previous messages
+                TextTools.clearMessages(toolForm);
+                
+                if (!TextTools.validateInput(text)) {
+                    TextTools.showError('Por favor, digite algum texto para inverter.', toolForm);
+                    return;
+                }
+
+                const invertedText = TextTools.reverseText(text);
+                resultContent.textContent = invertedText;
+                resultSection.style.display = 'block';
+                
+                TextTools.showSuccess('Texto invertido com sucesso!', toolForm);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                inputText.value = '';
+                resultSection.style.display = 'none';
+                TextTools.clearMessages(toolForm);
+                inputText.focus();
+            });
+
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(resultContent.textContent);
+                    TextTools.showSuccess('Texto copiado para a área de transferência!', resultSection);
+                } catch (err) {
+                    TextTools.showError('Erro ao copiar texto. Tente selecionar e copiar manualmente.', resultSection);
+                }
+            });
+
+            // Auto-focus on input
+            inputText.focus();
+        });
+    </script>
+</body>
+</html>
