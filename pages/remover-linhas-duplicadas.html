@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remover Linhas Duplicadas - invertexto.com</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="../index.html" style="text-decoration: none; color: inherit;">
+                        <h1><span class="logo-invert">invert</span><span class="logo-texto">exto</span><span class="logo-com">.com</span></h1>
+                        <p class="tagline">Ferramentas e Aplicativos Online</p>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <div class="follow-button">
+                        <span class="follow-text">Siga @invertexto</span>
+                    </div>
+                    <ul class="nav-list">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="tool-page">
+            <div class="breadcrumb">
+                <a href="../index.html">Home</a> > Remover Linhas Duplicadas
+            </div>
+
+            <div class="tool-header">
+                <h1>Remover Linhas Duplicadas</h1>
+                <p>Remove as linhas repetidas de uma lista, mantendo apenas uma ocorrência de cada linha única.</p>
+            </div>
+
+            <div class="tool-form">
+                <div class="form-group">
+                    <label for="inputText" class="form-label">Cole sua lista (uma linha por item):</label>
+                    <textarea id="inputText" class="form-textarea" placeholder="Item 1&#10;Item 2&#10;Item 1&#10;Item 3&#10;Item 2"></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="removeBtn" class="btn btn-primary">Remover Duplicadas</button>
+                    <button id="clearBtn" class="btn btn-secondary">Limpar</button>
+                </div>
+            </div>
+
+            <div id="resultSection" class="result-section" style="display: none;">
+                <h3>Lista sem Duplicatas:</h3>
+                <div id="resultContent" class="result-content"></div>
+                <div id="statsContent" style="margin-top: 1rem; padding: 1rem; background-color: var(--bg-light-gray); border-radius: 0.375rem; font-size: 0.875rem; color: var(--text-gray);"></div>
+                <div class="btn-group" style="margin-top: 1rem;">
+                    <button id="copyBtn" class="btn btn-secondary">Copiar Resultado</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputText = document.getElementById('inputText');
+            const removeBtn = document.getElementById('removeBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            const statsContent = document.getElementById('statsContent');
+            const toolForm = document.querySelector('.tool-form');
+
+            removeBtn.addEventListener('click', () => {
+                const text = inputText.value;
+                
+                // Clear previous messages
+                TextTools.clearMessages(toolForm);
+                
+                if (!TextTools.validateInput(text)) {
+                    TextTools.showError('Por favor, digite algum texto para processar.', toolForm);
+                    return;
+                }
+
+                const originalLines = text.split('\n');
+                const filteredLines = originalLines.filter(line => line.trim() !== '');
+                const uniqueText = TextTools.removeDuplicateLines(text);
+                const uniqueLines = uniqueText.split('\n').filter(line => line.trim() !== '');
+                
+                const originalCount = filteredLines.length;
+                const uniqueCount = uniqueLines.length;
+                const duplicatesRemoved = originalCount - uniqueCount;
+
+                resultContent.textContent = uniqueText;
+                statsContent.innerHTML = `
+                    <strong>Estatísticas:</strong><br>
+                    • Linhas originais: ${originalCount}<br>
+                    • Linhas únicas: ${uniqueCount}<br>
+                    • Duplicatas removidas: ${duplicatesRemoved}
+                `;
+                resultSection.style.display = 'block';
+                
+                TextTools.showSuccess(`${duplicatesRemoved} linha(s) duplicada(s) removida(s)!`, toolForm);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                inputText.value = '';
+                resultSection.style.display = 'none';
+                TextTools.clearMessages(toolForm);
+                inputText.focus();
+            });
+
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(resultContent.textContent);
+                    TextTools.showSuccess('Lista copiada para a área de transferência!', resultSection);
+                } catch (err) {
+                    TextTools.showError('Erro ao copiar texto. Tente selecionar e copiar manualmente.', resultSection);
+                }
+            });
+
+            // Auto-focus on input
+            inputText.focus();
+        });
+    </script>
+</body>
+</html>
